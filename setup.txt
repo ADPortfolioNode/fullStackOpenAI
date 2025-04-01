@@ -22,12 +22,12 @@ const socketio = SocketIO(app, { cors: { origin: "http://localhost:5000" } });
 # flaskserver chromadb Socket Configuration
 # Use case: Backend server using Socket.IO to handle WebSocket connections for ChromaDB services
 # filepath: /e:/2024 RESET/fullStackOpenAI/backend/src/flaskserver.js
-const chromadbSocket = SocketIO(app, { cors: { origin: "http://localhost:8000" } });
+const chromadbSocket = SocketIO(app, { cors: { origin: "http://localhost:8001" } });  # Changed port to 8001
 
 all port5000 accesspoints are port:5000/
 all port5000 chromadb accesspoints are port:5000/api/
-all port8000 accesspoints and schema are defined at localhost:8000/docs
-all port8000 endpoints are localhost:8000/openai.json
+all port8000 accesspoints and schema are defined at localhost:8001/docs
+all port8000 endpoints are localhost:8001/openai.json
 frontend only access port5000 accesspoints.
 
 all backend endpoints are exposed to localhost3000 via flaskserver responses and endpoints.
@@ -66,6 +66,6 @@ the main thread is never complete because task one is to maintain the main threa
 
 on load init socket then only when an api enpoint is accessed.
 when given a task - the assistant tries to break task into smaller parts. 
-and assign steps to new thread for execution - 
+and assign steps to new thread for execution -
 
 
