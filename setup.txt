@@ -1,71 +1,67 @@
 # App.js frontend Socket Configuration
 # Use case: Frontend application connecting to the backend server via WebSocket
-# filepath: /e:/2024 RESET/fullStackOpenAI/FrontEnd/src/App.js
-const socketInstance = io('http://localhost:5000', { path: '/ws' });
+# filepath: e:/2024 RESET/fullStackOpenAI/FrontEnd/src/App.js
+# Note: Socket connection is now handled in Concierge.js and useSocket.js
+# const socketInstance = io('http://localhost:5000', { path: '/socket.io' });
 
-# server.py chromadb Socket Configuration
+# Concierge.js frontend Socket Configuration
+# Use case: Frontend application connecting to the backend server via WebSocket
+# filepath: e:/2024 RESET/fullStackOpenAI/FrontEnd/src/components/Concierge.js
+const socketInstance = io(REACT_APP_API_BASE_URL, { path: '/socket.io' });
+
+# useSocket.js frontend Socket Configuration
+# Use case: Frontend application connecting to the backend server via WebSocket
+# filepath: e:/2024 RESET/fullStackOpenAI/FrontEnd/src/hooks/useSocket.js
+const socketInstance = io('http://localhost:5000', {
+  path: '/socket.io',
+  transports: ['websocket', 'polling'],
+  reconnection: true,
+  reconnectionAttempts: 5,
+  reconnectionDelay: 1000,
+  timeout: 60000,
+  autoConnect: true,
+  forceNew: true,
+  namespace: '/ws'
+});
+
+# FlaskServer.py Socket Configuration
 # Use case: Backend server using Flask-SocketIO to handle WebSocket connections
-# filepath: /e:/2024 RESET/fullStackOpenAI/backend/server.py
-from flask_socketio import SocketIO
-socketio = SocketIO(app, cors_allowed_origins="http://localhost:5000")
+# filepath: e:/2024 RESET/fullStackOpenAI/backend/FlaskServer.py
+socketio = SocketIO(
+    app,
+    cors_allowed_origins="*",
+    async_mode='threading',
+    path='/socket.io',
+    logger=True,
+    engineio_logger=True,
+    ping_timeout=60000,
+    ping_interval=25000
+)
 
-# server.js openai Socket Configuration
-# Use case: Backend server using Socket.IO to handle WebSocket connections for OpenAI services
-# filepath: /e:/2024 RESET/fullStackOpenAI/backend/src/server.js
-const socketio = SocketIO(app, { cors: { origin: "http://localhost:5000" } });
+# FlaskServer.py ChromaDB Configuration
+# Use case: Backend server initializing ChromaDB client and collection
+# filepath: e:/2024 RESET/fullStackOpenAI/backend/FlaskServer.py
+# ChromaDB is running locally on port 8000
+chroma_client = chromadb.Client(host="localhost", port=8000)
+collection = chroma_client.create_collection("digital_media_tasks")
 
-# flaskserver Socket Configuration
-# Use case: Backend server using Socket.IO to handle WebSocket connections for Flask services
-# filepath: /e:/2024 RESET/fullStackOpenAI/backend/src/flaskserver.js
-const socketio = SocketIO(app, { cors: { origin: "http://localhost:5000" } });
+# Port Assignments
+# port5000: Flask server (backend) - Serves API endpoints and handles Socket.IO connections
+# port3000: React application (frontend) - Interacts with the backend through API calls
+# port8000: ChromaDB - Vector database
 
-# flaskserver chromadb Socket Configuration
-# Use case: Backend server using Socket.IO to handle WebSocket connections for ChromaDB services
-# filepath: /e:/2024 RESET/fullStackOpenAI/backend/src/flaskserver.js
-const chromadbSocket = SocketIO(app, { cors: { origin: "http://localhost:8001" } });  # Changed port to 8001
+# Data Flow
+# Frontend (port 3000) communicates with Flask server (port 5000) for API requests and WebSocket connections.
+# Flask server acts as a data fork funnel for the frontend API calls.
+# Flask server interacts with ChromaDB (port 8000) for RAG operations.
 
-all port5000 accesspoints are port:5000/
-all port5000 chromadb accesspoints are port:5000/api/
-all port8000 accesspoints and schema are defined at localhost:8001/docs
-all port8000 endpoints are localhost:8001/openai.json
-frontend only access port5000 accesspoints.
-
-all backend endpoints are exposed to localhost3000 via flaskserver responses and endpoints.
-so the full menu is 
-flaskserver/
-flaskserver/api = chromadb
-flaskerver/ = openai routes
-
-to the front end - all routes are port5000
-the flask server is a data fork funnel for the frontend api calls.
-
-the front end should work like this.
-the app.js maintains state, 
-when components generate responses - they raise response to state to state each endpoint monitors state and changes behavior based off state.
-
-the display area renders only what useState('response') presents - and all other components return their setResponse('message', 'savedPath') to state.
-
-the display area is alway full available width and
-text displays first, beneath that is audio controls and 
-BEHIND that is full width image, video displays 
-there may be a need to show more than one at a time depending on responses from server.
-
-the main thread initiates once when server loads.
-all threads have three parts :
-
-task
-assistant
-messages
-
-thread assistant instructions are augmented by the thread task and the assistant communicates via messages - which are shared with main thread.
-
-all threads are clones and only their directions are different. 
-all assistants are clones and only their tasks are different
-all  tasks when completed close the thread.
-the main thread is never complete because task one is to maintain the main thread.
-
-on load init socket then only when an api enpoint is accessed.
-when given a task - the assistant tries to break task into smaller parts. 
-and assign steps to new thread for execution -
+# Notes
+# The flask server is a data fork funnel for the frontend API calls.
+# The front end should work like this:
+# The app.js maintains state.
+# When components generate responses, they update the state.
+# Each endpoint monitors state and changes behavior based on state.
+# The DisplayArea renders only what useState('response') presents, and all other components return their setResponse('message', 'savedPath') to state.
+# ChromaDB is initialized within FlaskServer.py and stores data related to RAG tasks.
 
 
