@@ -13,7 +13,7 @@ This project is a comprehensive full-stack application that leverages OpenAI's c
 ## Technologies Used
 - **Frontend**: React, Redux, HTML5, CSS3, JavaScript
 - **Backend**: Node.js, Express.js
-- **Database**: MongoDB
+- **Database**: ChromaDb
 - **AI Integration**: OpenAI API
 - **Version Control**: Git, GitHub
 
